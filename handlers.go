@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+type CreateTodoRequest struct {
+	Description string `json:"description"`
+}
+
 func parseIDFromPath(path string) (int, error) {
 	urlToString := strings.Split(path, "/")
 	var cleanPath []string
@@ -43,14 +47,12 @@ func UpdateTodoHandler(store *TodoStore) http.HandlerFunc {
 		}
 
 		var updates map[string]interface{}
-		err = json.NewDecoder(r.Body).Decode(&updates)
-		if err != nil {
+		if err = json.NewDecoder(r.Body).Decode(&updates); err != nil {
 			http.Error(w, "Invalid JSON", http.StatusBadRequest)
 			return
 		}
 
-		err = store.UpdateTodoByID(id, updates)
-		if err != nil {
+		if err = store.UpdateTodoByID(id, updates); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -63,5 +65,30 @@ func UpdateTodoHandler(store *TodoStore) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(updatedTodo)
+	}
+}
+
+func CreateTodoHandler(store *TodoStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Invalid method", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var req CreateTodoRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
+
+		if strings.TrimSpace(req.Description) == "" {
+			http.Error(w, "Input cannot be empty", http.StatusBadRequest)
+			return
+		}
+
+		newTodo := store.AddTodo(req.Description)
+
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(newTodo)
 	}
 }
