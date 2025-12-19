@@ -92,3 +92,19 @@ func CreateTodoHandler(store *TodoStore) http.HandlerFunc {
 		json.NewEncoder(w).Encode(newTodo)
 	}
 }
+
+func ListTodoHandler(store *TodoStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		todos := store.GetTodos()
+
+		w.Header().set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(todos)
+	}
+}
