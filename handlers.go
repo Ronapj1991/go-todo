@@ -103,7 +103,7 @@ func ListTodoHandler(store *TodoStore) http.HandlerFunc {
 
 		todos := store.GetTodos()
 
-		w.Header().set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(todos)
 	}
