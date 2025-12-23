@@ -108,3 +108,26 @@ func ListTodoHandler(store *TodoStore) http.HandlerFunc {
 		json.NewEncoder(w).Encode(todos)
 	}
 }
+
+func DeleteTodoHandler(store *TodoStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		if r.Method != http.MethodDelete {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		id, err := parseIDFromPath(r.URL.Path)
+		if err != nil {
+			http.Error(w, "Invalid ID", http.StatusBadRequest)
+			return
+		}
+
+		if err := store.DeleteTodoByID(id); err != nil {
+			http.Error(w, "Todo not found", http.StatusNotFound)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
