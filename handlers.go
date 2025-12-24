@@ -148,3 +148,19 @@ func TodosHandler(store *TodoStore) http.HandlerFunc {
 
 	}
 }
+
+func TodosByIDHandler(store *TodoStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPatch:
+			UpdateTodoHandler(store)(w, r)
+			return
+		case http.MethodDelete:
+			DeleteTodoHandler(store)(w, r)
+			return
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+	}
+}
