@@ -131,3 +131,20 @@ func DeleteTodoHandler(store *TodoStore) http.HandlerFunc {
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
+
+func TodosHandler(store *TodoStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			ListTodoHandler(store)(w, r)
+			return
+		case http.MethodPost:
+			CreateTodoHandler(store)(w, r)
+			return
+		default:
+			http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+	}
+}
