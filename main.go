@@ -17,6 +17,8 @@ func main() {
 	http.HandleFunc("/todos", TodosHandler(store))
 	http.HandleFunc("/todos/", TodosByIDHandler(store))
 
+	http.Handle("/", http.FileServer(http.Dir("./frontend")))
+
 	fmt.Println("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)
