@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -88,6 +89,7 @@ func CreateTodoHandler(store *TodoStore) http.HandlerFunc {
 
 		newTodo := store.AddTodo(req.Description)
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(newTodo)
 	}

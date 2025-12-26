@@ -32,12 +32,20 @@ func (s *TodoStore) DeleteTodoByID(ID int) error {
 	return errors.New("ID not found for deletion")
 }
 
-func (s *TodoStore) UpdateTodoByID(ID int, changes map[string]interface{}) error {
+func (s *TodoStore) UpdateTodoByID(id int, changes map[string]interface{}) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	targetTodo, ok := s.FindTodoByID(ID)
-	if !ok {
+	var target *Todo
+
+	for i := range s.Todos {
+		if s.Todos[i].ID == id {
+			target = &s.Todos[i]
+			break
+		}
+	}
+
+	if target == nil {
 		return errors.New("Invalid ID")
 	}
 
@@ -48,15 +56,17 @@ func (s *TodoStore) UpdateTodoByID(ID int, changes map[string]interface{}) error
 			if !ok {
 				return errors.New("Completed must be true or false")
 			}
-			targetTodo.Completed = completed
+			target.Completed = completed
+
 		case "Description":
 			description, ok := v.(string)
 			if !ok {
 				return errors.New("Invalid description")
 			}
-			targetTodo.Description = description
+			target.Description = description
 		}
 	}
+
 	return nil
 }
 
