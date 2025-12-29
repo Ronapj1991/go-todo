@@ -8,8 +8,20 @@ window.addEventListener("load", () => {
     })
     .then(data => {
         console.log("Todos from server:", data);
+        renderTodos(data);
     })
     .catch(err => {
         console.error("Fetch error:", err);
     });
 });
+
+function renderTodos(todos) {
+    const list = document.getElementById("todo-list");
+    list.innerHTML = "";
+    
+    todos.forEach(todo => {
+        const li = document.createElement("li");
+        li.textContent = todo.Description;
+        list.appendChild(li);
+    });
+}   
