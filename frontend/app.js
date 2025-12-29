@@ -36,12 +36,44 @@ window.addEventListener("load", () => {
 });
 
 function renderTodos(todos) {
-  const list = document.getElementById("todo-list");
+  const list  = document.getElementById("todo-list");
   list.innerHTML = "";
-
+  
   todos.forEach(todo => {
     const li = document.createElement("li");
-    li.textContent = todo.Description;
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = todo.Completed;
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    
+    checkbox.addEventListener("change", () => {
+      fetch(`/todos/${todo.ID}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify( { Completed: checkbox.checked } )
+      })
+      .then(() => fetch("/todos"))
+      .then(res => res.json())
+      .then(renderTodos)
+      .catch(err => console.error(err))
+    });
+    
+    deleteBtn.addEventListener("click", () => {
+      fetch(`/todos/${todo.ID}`, {
+        method: "DELETE"
+      })
+      .then(() => fetch("/todos"))
+      .then(res => res.json())
+      .then(renderTodos)
+      .catch(err => console.error(err));
+    });
+    
+    li.appendChild(checkbox);
+    li.appendChild(document.createTextNode(" " + todo.Description));
+    li.appendChild(deleteBtn);
     list.appendChild(li);
   });
 }
